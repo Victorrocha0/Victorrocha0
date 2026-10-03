@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="150" viewBox="0 0 380 150" font-family="Segoe UI, Ubuntu, sans-serif">
+<rect width="380" height="150" rx="8" fill="#EDE7FA"/>
+<text x="20" y="35" fill="#6B3FC9" font-size="18" font-weight="600">GitHub contributions</text>
+<text x="20" y="70" fill="#3B2A5E" font-size="14">Total contributions (all time)</text><text x="360" y="70" fill="#3B2A5E" font-size="14" font-weight="600" text-anchor="end">615</text><text x="20" y="98" fill="#3B2A5E" font-size="14">Last 12 months</text><text x="360" y="98" fill="#3B2A5E" font-size="14" font-weight="600" text-anchor="end">252</text><text x="20" y="126" fill="#3B2A5E" font-size="14">On GitHub since</text><text x="360" y="126" fill="#3B2A5E" font-size="14" font-weight="600" text-anchor="end">2022</text>
+</svg>
