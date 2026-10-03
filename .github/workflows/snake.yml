@@ -1,4 +1,4 @@
-name: Generate snake
+name: Generate snake and stats
 
 on:
   schedule:
@@ -19,6 +19,74 @@ jobs:
           github_user_name: ${{ github.repository_owner }}
           outputs: |
             dist/github-snake.svg?color_snake=#6B3FC9&color_dots=#EDE7FA,#C9B6F2,#A78BEA,#7F5BD6,#5B35B0
+
+      - name: Generate all-time stats card
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOGIN: ${{ github.repository_owner }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          from datetime import datetime, timedelta, timezone
+
+          TOKEN = os.environ["GITHUB_TOKEN"]
+          LOGIN = os.environ["LOGIN"]
+          Q = """query($login:String!,$from:DateTime,$to:DateTime){
+            user(login:$login){
+              createdAt
+              contributionsCollection(from:$from,to:$to){
+                contributionCalendar{totalContributions}
+              }
+            }
+          }"""
+
+          def gql(variables):
+              req = urllib.request.Request(
+                  "https://api.github.com/graphql",
+                  data=json.dumps({"query": Q, "variables": variables}).encode(),
+                  headers={"Authorization": "bearer " + TOKEN, "Content-Type": "application/json"},
+              )
+              with urllib.request.urlopen(req) as r:
+                  data = json.load(r)
+              if "errors" in data:
+                  raise SystemExit(data["errors"])
+              return data["data"]["user"]
+
+          first = gql({"login": LOGIN})
+          created = datetime.fromisoformat(first["createdAt"].replace("Z", "+00:00"))
+          last_year = first["contributionsCollection"]["contributionCalendar"]["totalContributions"]
+
+          now = datetime.now(timezone.utc)
+          total = 0
+          start = created
+          while start < now:
+              end = min(start + timedelta(days=364), now)
+              user = gql({"login": LOGIN, "from": start.isoformat(), "to": end.isoformat()})
+              total += user["contributionsCollection"]["contributionCalendar"]["totalContributions"]
+              start = end + timedelta(seconds=1)
+
+          rows = [
+              ("Total contributions (all time)", f"{total:,}"),
+              ("Last 12 months", f"{last_year:,}"),
+              ("On GitHub since", str(created.year)),
+          ]
+          lines = ""
+          for i, (label, value) in enumerate(rows):
+              y = 70 + i * 28
+              lines += f'<text x="20" y="{y}" fill="#3B2A5E" font-size="14">{label}</text>'
+              lines += f'<text x="360" y="{y}" fill="#3B2A5E" font-size="14" font-weight="600" text-anchor="end">{value}</text>'
+
+          svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="380" height="150" viewBox="0 0 380 150" font-family="Segoe UI, Ubuntu, sans-serif">
+          <rect width="380" height="150" rx="8" fill="#EDE7FA"/>
+          <text x="20" y="35" fill="#6B3FC9" font-size="18" font-weight="600">GitHub contributions</text>
+          {lines}
+          </svg>'''
+
+          os.makedirs("dist", exist_ok=True)
+          with open("dist/stats.svg", "w") as f:
+              f.write(svg)
+          print("total", total, "last year", last_year)
+          PY
 
       - uses: crazy-max/ghaction-github-pages@v3
         with:
