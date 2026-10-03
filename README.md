@@ -42,7 +42,7 @@
 ## GitHub stats
 
 <p align="center">
-  <img height="165" src="https://github-readme-stats.vercel.app/api?username=Victorrocha0&show_icons=true&hide_border=true&include_all_commits=true&count_private=true&bg_color=EDE7FA&title_color=6B3FC9&text_color=3B2A5E&icon_color=6B3FC9" />
+    <img height="165" src="https://github-readme-stats.vercel.app/api?username=Victorrocha0&show_icons=true&hide_border=true&count_private=true&v=2&bg_color=EDE7FA&title_color=6B3FC9&text_color=3B2A5E&icon_color=6B3FC9" />
 </p>
 
 <p align="center">
